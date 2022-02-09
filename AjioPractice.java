@@ -58,6 +58,7 @@ public class AjioPractice {
 		driver.findElementByXPath("//*[@id=\"maxPrice\"]").sendKeys("5000");
 
 		// Click enter
+		.
 
 		driver.findElementByXPath("//button[@class='rilrtl-button ic-toparw']").click();
 
