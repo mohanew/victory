@@ -2,6 +2,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
+import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,7 +11,7 @@ import java.net.http.HttpResponse;
 import static io.restassured.RestAssured.given;
 
 
-public class APIAutomation
+public class WebAPITesting
 {
      @Test
     public void getrequest()
@@ -38,6 +39,7 @@ public class APIAutomation
         System.out.println(res.getStatusCode());
         JsonPath var1 = new JsonPath(res.asString());
         int var=var1.getInt("data.size()");
+        Assert.assertEquals(6,var);
         System.out.println(var);
 
 
@@ -100,6 +102,26 @@ public class APIAutomation
 
 
     }
+
+    @Test
+    public void PostAPI() {
+
+        RestAssured.useRelaxedHTTPSValidation();
+        //System.out.println(given().get("https://reqres.in/api").then().statusCode(404));
+        JSONObject request = new JSONObject();
+        request.put("name", "chaya");
+        request.put("job", "BA");
+        System.out.println(request);
+        System.out.println(request.toString());
+        given().
+                body(request.toJSONString()).
+                when().
+                post("https://reqres.in/api/users").
+                then().statusCode(201 );
+
+
+    }
+
 
 
 }
