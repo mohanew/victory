@@ -2,8 +2,10 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
+import io.restassured.specification.RequestSpecification;
 import org.json.simple.JSONObject;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.net.http.HttpResponse;
@@ -11,46 +13,47 @@ import java.net.http.HttpResponse;
 import static io.restassured.RestAssured.given;
 
 
-public class WebAPITesting
-{
-     @Test
-    public void getrequest()
-    {
+public class WebAPITesting {
+
+    private static String requestBody = "{\n" +
+            "  \"title\": \"foo\",\n" +
+            "  \"body\": \"bar\",\n" +
+            "  \"userId\": \"1\" \n}";
+    @Test
+    public void getrequest() {
         RestAssured.useRelaxedHTTPSValidation();
         //System.out.println(given().get("https://reqres.in/api").then().statusCode(404));
-        Response res=RestAssured.get("https://reqres.in/api/users/2");
+        Response res = RestAssured.get("https://reqres.in/api/users/2");
         System.out.println(res.getStatusCode());
         System.out.println(res.getBody().asString());
         System.out.println(res.jsonPath().getString("data.email"));
         System.out.println(res.jsonPath().getString("data.first_name"));
-        Assert.assertEquals(res.getStatusCode(),200);
-        Assert.assertEquals("janet.weaver@reqres.in",res.jsonPath().getString("data.email"));
-        Assert.assertEquals("Janet",res.jsonPath().getString("data.first_name"));
+        Assert.assertEquals(res.getStatusCode(), 200);
+        Assert.assertEquals("janet.weaver@reqres.in", res.jsonPath().getString("data.email"));
+        Assert.assertEquals("Janet", res.jsonPath().getString("data.first_name"));
 
 
     }
 
     @Test
-    public void GetSize()
-    {
+    public void GetSize() {
         RestAssured.useRelaxedHTTPSValidation();
         //System.out.println(given().get("https://reqres.in/api").then().statusCode(404));
-        Response res=RestAssured.get("https://reqres.in/api/users?page=2");
+        Response res = RestAssured.get("https://reqres.in/api/users?page=2");
         System.out.println(res.getStatusCode());
         JsonPath var1 = new JsonPath(res.asString());
-        int var=var1.getInt("data.size()");
-        Assert.assertEquals(6,var);
+        int var = var1.getInt("data.size()");
+        Assert.assertEquals(6, var);
         System.out.println(var);
 
 
     }
 
     @Test
-    public void verifyAllDetails()
-    {
+    public void verifyAllDetails() {
         RestAssured.useRelaxedHTTPSValidation();
         //System.out.println(given().get("https://reqres.in/api").then().statusCode(404));
-        Response res=RestAssured.get("https://reqres.in/api/users?page=2");
+        Response res = RestAssured.get("https://reqres.in/api/users?page=2");
         System.out.println(res.getBody().asString());
         System.out.println(res.jsonPath().getString("data.id[0]"));
         System.out.println(res.jsonPath().getString("data.email[0]"));
@@ -58,11 +61,11 @@ public class WebAPITesting
         System.out.println(res.jsonPath().getString("data.last_name[0]"));
         System.out.println(res.jsonPath().getString("data.avatar[0]"));
 
-        Assert.assertEquals("7",res.jsonPath().getString("data.id[0]"));
-        Assert.assertEquals("michael.lawson@reqres.in",res.jsonPath().getString("data.email[0]"));
-        Assert.assertEquals("Michael",res.jsonPath().getString("data.first_name[0]"));
-        Assert.assertEquals("Lawson",res.jsonPath().getString("data.last_name[0]"));
-        Assert.assertEquals("https://reqres.in/img/faces/7-image.jpg",res.jsonPath().getString("data.avatar[0]"));
+        Assert.assertEquals("7", res.jsonPath().getString("data.id[0]"));
+        Assert.assertEquals("michael.lawson@reqres.in", res.jsonPath().getString("data.email[0]"));
+        Assert.assertEquals("Michael", res.jsonPath().getString("data.first_name[0]"));
+        Assert.assertEquals("Lawson", res.jsonPath().getString("data.last_name[0]"));
+        Assert.assertEquals("https://reqres.in/img/faces/7-image.jpg", res.jsonPath().getString("data.avatar[0]"));
 
         System.out.println(res.jsonPath().getString("data.id[0]"));
         System.out.println(res.jsonPath().getString("data.email[0]"));
@@ -100,11 +103,10 @@ public class WebAPITesting
         System.out.println(res.jsonPath().getString("data.avatar[5]"));
 
 
-
     }
 
     @Test
-    public void PostAPI() {
+    public void Postrequest1() {
 
         RestAssured.useRelaxedHTTPSValidation();
         //System.out.println(given().get("https://reqres.in/api").then().statusCode(404));
@@ -117,11 +119,36 @@ public class WebAPITesting
                 body(request.toJSONString()).
                 when().
                 post("https://reqres.in/api/users").
-                then().statusCode(201 );
+                then().statusCode(400);
 
 
     }
 
 
 
+
+    @BeforeTest
+    public static void setup() {
+        RestAssured.baseURI = "https://jsonplaceholder.typicode.com";
+    }
+
+    @Test
+    public void postRequest2() {
+        RestAssured.useRelaxedHTTPSValidation();
+        Response response = given()
+                .header("Content-type", "application/json")
+                .and()
+                .body(requestBody)
+                .when()
+                .post("/posts")
+                .then()
+                .extract().response();
+        System.out.println(response.statusCode());
+
+        Assert.assertEquals(201, response.statusCode());
+        Assert.assertEquals("foo", response.jsonPath().getString("title"));
+        Assert.assertEquals("bar", response.jsonPath().getString("body"));
+        Assert.assertEquals("1", response.jsonPath().getString("userId"));
+        Assert.assertEquals("101", response.jsonPath().getString("id"));
+    }
 }
