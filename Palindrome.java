@@ -70,6 +70,12 @@ public class Palindrome {
 		{
 			System.out.println("The Given String is not a Palindrome");
 		}
+
+
+
+
+		//Updated by mohan for github update purpose.
+
 		
    }
 
